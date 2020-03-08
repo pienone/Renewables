@@ -9,6 +9,7 @@ using CSV
 using LinearAlgebra
 using RCall
 using Plots
+using DataFrames
 #@rlibrary ggplot2
 
 
@@ -57,12 +58,12 @@ LSCost=100000000000000     #load shedding cost
 #######   ANALYSIS
 VOLUMES=zeros(length(T),length(G))
 VOLUMESWIND=zeros(length(T),length(WIND))
-REVENUES=zeros(length(T),length(G))
+REVENUES=zeros(length(T),length(G)+length(WIND))
 REVENUESWIND=zeros(length(T),length(WIND))
-PRICES=zeros(2,length(T))
+PRICES=zeros(length(T),2)
 FLOW=zeros(length(T))
 LOADSHEDDING=zeros(length(T))
-TOTREVENUES=zeros(length(G))
+TOTREVENUES=zeros(length(G)+length(WIND))
 
 
 
@@ -107,22 +108,46 @@ for g in G_DK2
 end
 
 for w in WWIND
-        REVENUESWIND[t,w]=(value.(qw[w]))*(dual.(equality1))
+        REVENUES[t,w+length(G)]=(value.(qw[w]))*(dual.(equality1))
 end
 
 for w in EWIND
-        REVENUESWIND[t,w]=(value.(qw[w]))*(dual.(equality2))
+        REVENUES[t,w+length(G)]=(value.(qw[w]))*(dual.(equality2))
 end
 
-for g in G
+for g in collect(1:(length(G)+length(WIND)))
         TOTREVENUES[g]=sum(REVENUES[g,:])
 end
+
+
  
 FLOW[t]=value.(F)
-PRICES[1,t]=dual.(equality1)
-PRICES[2,t]=dual.(equality2)
+PRICES[t,1]=dual.(equality1)
+PRICES[t,2]=dual.(equality2)
 LOADSHEDDING[t]=value.(LS)
 
 end
 
+
+df_P=DataFrame(PRICES)
+CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_prices.csv", df_P)
+
+df_V=DataFrame(VOLUMES)
+CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_volumes.csv", df_V)
+
+df_R=DataFrame(REVENUES)
+CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_revenues.csv", df_R)
+
+df_F=DataFrame(FLOW)
+CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_flow.csv", df_F)
+
+df_TR=DataFrame(TOTREVENUES)
+CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_totrevenues.csv", df_TR)
+
+
+
+
+plot(PRICES[:,1])
+plot!(PRICES[:,2])
+savefig("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Prices.png")
 
