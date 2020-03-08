@@ -26,8 +26,11 @@ WWIND= collect(1:2)     #Wind Generators DK1
 EWIND= collect(3:4)     #Wind Generators DK2
 IMP=collect(1:2)        #Importers
 
+
+
 #data acquisition
-X = CSV.read("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/assignment1.csv", delim=",")
+path="C:/Users/pietr/Documents/DTU/Renewables in electricity markets"
+X = CSV.read("$path/assignment1.csv", delim=",")
 
 
 #GENERATION
@@ -56,14 +59,15 @@ LSCost=100000000000000     #load shedding cost
 
 
 #######   ANALYSIS
-VOLUMES=zeros(length(T),length(G))
+VOLUMES=zeros(length(T),length(G)+length(WIND))
 VOLUMESWIND=zeros(length(T),length(WIND))
 REVENUES=zeros(length(T),length(G)+length(WIND))
 REVENUESWIND=zeros(length(T),length(WIND))
+TOTREVENUES=zeros(length(G)+length(WIND))
 PRICES=zeros(length(T),2)
 FLOW=zeros(length(T))
 LOADSHEDDING=zeros(length(T))
-TOTREVENUES=zeros(length(G)+length(WIND))
+
 
 
 
@@ -96,7 +100,7 @@ for g in G
 end
 
 for w in WIND
-        VOLUMES[t,w]=value.(qw[w])
+        VOLUMES[t,w+length(G)]=value.(qw[w])
 end
 
 for g in G_DK1
@@ -120,34 +124,35 @@ for g in collect(1:(length(G)+length(WIND)))
 end
 
 
- 
+
 FLOW[t]=value.(F)
 PRICES[t,1]=dual.(equality1)
 PRICES[t,2]=dual.(equality2)
 LOADSHEDDING[t]=value.(LS)
+RESULTS=hcat(VOLUMES,REVENUES,PRICES,FLOW,LOADSHEDDING)
 
 end
 
 
 df_P=DataFrame(PRICES)
-CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_prices.csv", df_P)
+CSV.write("$path/Results_prices.csv", df_P)
 
 df_V=DataFrame(VOLUMES)
-CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_volumes.csv", df_V)
+CSV.write("$path/Results_volumes.csv", df_V)
 
 df_R=DataFrame(REVENUES)
-CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_revenues.csv", df_R)
+CSV.write("$path/Results_revenues.csv", df_R)
 
-#df_F=DataFrame(FLOW)
-#CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_flow.csv", df_F)
+df_FLS=DataFrame(hcat(FLOW,LOADSHEDDING))
+CSV.write("$path/Results_flow.csv", df_FLS)
 
-#df_TR=DataFrame(TOTREVENUES)
-#CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_totrevenues.csv", df_TR)
+df_TR=DataFrame(hcat(TOTREVENUES))
+CSV.write("$path/Results_totrevenues.csv", df_TR)
 
 
 
 
 plot(PRICES[:,1])
 plot!(PRICES[:,2])
-savefig("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Prices.png")
+savefig("$path/Prices.png")
 
