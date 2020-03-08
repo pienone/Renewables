@@ -138,11 +138,11 @@ CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Result
 df_R=DataFrame(REVENUES)
 CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_revenues.csv", df_R)
 
-df_F=DataFrame(FLOW)
-CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_flow.csv", df_F)
+#df_F=DataFrame(FLOW)
+#CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_flow.csv", df_F)
 
-df_TR=DataFrame(TOTREVENUES)
-CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_totrevenues.csv", df_TR)
+#df_TR=DataFrame(TOTREVENUES)
+#CSV.write("C:/Users/pietr/Documents/DTU/Renewables in electricity markets/Results_totrevenues.csv", df_TR)
 
 
 
